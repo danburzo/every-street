@@ -1,8 +1,9 @@
 # OSM data
-data
+data/*.osm.pbf
 
 # generated files
-output
+output/*.txt
+output/*.svg
 
 # leveldb
 db
