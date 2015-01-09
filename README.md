@@ -1,4 +1,4 @@
-# toate-strazile
+# every-street
 
 Every street in Romania, based on OSM data.
 
@@ -10,7 +10,7 @@ Clone this repository and run `npm install` on it.
 
 Here's how to create a similar map for any area:
 
-1. Dowload an `.osm.pbf` OpenStreetMap data file for your country/area and place it into the `data` folder.
+1. Dowload an `.osm.pbf` OpenStreetMap data file for your country/area from [download.geofabrik.de](http://download.geofabrik.de/europe.html) and place it into `data/data.osm.pbf`.
 2. Extract data from your OSM file:
 2.1. `node tools/extract-roads.js` will generate `output/roads.txt`;
 2.2. `node tools/extract-nodes.js` will extract all nodes from the file into `output/nodes.txt`;
@@ -20,3 +20,11 @@ Here's how to create a similar map for any area:
 6. Generate the final SVG: `node tools/generate-svg.js`.
 
 Boom!
+
+Or, if you're brave enough, run them all in one fell swoop:
+
+```bash
+node tools/extract-roads.js && node tools/extract-nodes.js && node tools/load-nodes.js && node tools/apply-nodes.js && node tools/map-coords.js && node tools/generate-svg.js
+```
+
+...and wait... and wait.

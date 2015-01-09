@@ -25,5 +25,8 @@ levelup('db', function(err, db) {
 				next();
 			}
 		}))
-		.pipe(write_stream);
+		.pipe(write_stream)
+		.on('finish', function() {
+			console.log('Finished importing nodes into the database.');
+		});
 });

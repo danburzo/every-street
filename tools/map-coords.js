@@ -75,4 +75,7 @@ fs.createReadStream('output/roads-with-coords.txt', { encoding: 'utf8' })
 		this.push(pts.join(';') + '\n');
 		next();
 	}))
-	.pipe(fs.createWriteStream('output/roads-with-coords-screen.txt'));
+	.pipe(fs.createWriteStream('output/roads-with-coords-screen.txt'))
+	.on('finish', function() {
+		console.log('Finished mapping nodes using Mercator projection.');
+	});

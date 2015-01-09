@@ -27,4 +27,7 @@ fs.createReadStream('output/roads-with-coords-screen.txt', { encoding: 'utf8' })
 		this.push('<path d="' + path_data + '"/>\n');
 		next();
 	}))
-	.pipe(write_stream);
+	.pipe(write_stream)
+	.on('finish', function() {
+		console.log('Finished generating SVG. (Please add </svg> to the end of the file!)');
+	});

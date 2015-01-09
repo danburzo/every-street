@@ -7,7 +7,7 @@ function isRoad(item) {
 	return item.type === 'way' && item.tags.highway;
 }
 
-fs.createReadStream('data/romania-latest.osm.pbf')
+fs.createReadStream('data/data.osm.pbf')
 	.pipe(new osm_parser())
 	.pipe(
 		through2.obj(function(items, enc, next) {
@@ -24,4 +24,6 @@ fs.createReadStream('data/romania-latest.osm.pbf')
 	)
 	.pipe(
 		fs.createWriteStream('output/roads.txt')
-	);
+	).on('finish', function() {
+		console.log('Finished extracting roads from OSM data.');
+	});

@@ -6,9 +6,9 @@ var fs = require('fs'),
 
 levelup('db', function(err, db) {
 
-	var write_stream = fs.createWriteStream('output/rivers-with-coords.txt');
+	var write_stream = fs.createWriteStream('output/roads-with-coords.txt');
 
-	fs.createReadStream('output/rivers.txt', { encoding: 'utf8' })
+	fs.createReadStream('output/roads.txt', { encoding: 'utf8' })
 		.pipe(split2())
 		.pipe(through2.obj(function(line, enc, next){
 			async.mapSeries(line.split(','), function(node_id, callback) {
@@ -20,5 +20,8 @@ levelup('db', function(err, db) {
 				next();
 			}.bind(this));
 		}))
-		.pipe(write_stream);
+		.pipe(write_stream)
+		.on('finish', function() {
+			console.log('Finished applying nodes.');
+		});
 });
