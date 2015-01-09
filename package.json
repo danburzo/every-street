@@ -1,0 +1,13 @@
+{
+  "name": "toate-strazile",
+  "version": "0.1.0",
+  "devDependencies": {
+    "JSONStream": "^0.10.0",
+    "async": "^0.9.0",
+    "level": "^0.18.0",
+    "multiline": "^1.0.1",
+    "osm-pbf-parser": "^2.1.2",
+    "split2": "^0.2.1",
+    "through2": "^0.6.3"
+  }
+}

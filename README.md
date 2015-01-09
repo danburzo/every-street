@@ -1,4 +1,3 @@
-toate-strazile
-==============
+# toate-strazile
 
-Toate străzile din România.
+Every street in Romania, based on OSM data.
