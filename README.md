@@ -2,6 +2,8 @@
 
 Every street in Romania, based on OSM data.
 
+![Sample](img/streets.jpg)
+
 ## Installing
 
 Clone this repository and run `npm install` on it.
@@ -28,3 +30,11 @@ node tools/extract-roads.js && node tools/extract-nodes.js && node tools/load-no
 ```
 
 ...and wait... and wait.
+
+### Converting the SVG to PNG
+
+ImageMagick has worked for me:
+
+```bash
+convert -density 900 output/roads.svg output/roads.png
+```

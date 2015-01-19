@@ -24,10 +24,10 @@ fs.createReadStream('output/roads-with-coords-screen.txt', { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
 		var path_data = 'M ' + line.replace(/\;/g, ' L ').replace(/\,/g, ' ');
-		this.push('<path d="' + path_data + '"/>\n');
+		this.push('<path d="' + path_data + '" stroke-width="0.1" stroke="black" fill="none"/>\n');
 		next();
+	}, function(flush) {
+		this.push('</svg>');
+		flush();
 	}))
-	.pipe(write_stream)
-	.on('finish', function() {
-		console.log('Finished generating SVG. (Please add </svg> to the end of the file!)');
-	});
+	.pipe(write_stream);
