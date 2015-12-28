@@ -2,75 +2,50 @@ var fs = require('fs');
 var through2 = require('through2');
 var split2 = require('split2');
 
-var INPUT_FILE = 'output/roads-with-coords.txt';
-var OUTPUT_FILE = 'output/roads-with-coords-screen.txt';
+var INPUT_FILE = 'output/streets-with-coordinates.txt';
+var OUTPUT_FILE = 'output/streets-with-coordinates-mapped.txt';
+var BBOX_FILE = 'output/bbox.json';
 
-var Mercator = function(options) {
-	this.mapSize = options.mapSize;
-	this.bbox = options.bbox;
-};
+// read the bounding box and project it using Mercator
+var o = JSON.parse(fs.readFileSync(BBOX_FILE, 'utf8'));
+var nw_projected = projection(o.bbox.north, o.bbox.west);
+var se_projected = projection(o.bbox.south, o.bbox.east);
+var north = nw_projected[1];
+var south = se_projected[1];
+var west = nw_projected[0];
+var east = se_projected[0];
 
-Mercator.prototype.getPoint = function(lat, lon) {
-	return { 
-		x: this.getX(lon),
-		y: this.getY(lat)
-	};
-};
-
-Mercator.prototype.getPointString = function(lat, lon) {
-	return this.getX(lon) + ',' + this.getY(lat);
-};
-
-Mercator.prototype.getRelativeY = function(lat) {
-	return Math.log(Math.tan(this.toRadians(lat)/2 + Math.PI/4 ));
-};
-
-Mercator.prototype.getY = function(lat) {
-	return this.mapSize.height * 
-		(this.getRelativeY(lat) - this.getRelativeY(this.bbox.north)) / 
-		(this.getRelativeY(this.bbox.south) - this.getRelativeY(this.bbox.north))
-	;
-};
-
-Mercator.prototype.getX = function(lon) {
-	return this.mapSize.width * 
-		(this.toRadians(lon) - this.toRadians(this.bbox.west)) / 
-		(this.toRadians(this.bbox.east) - this.toRadians(this.bbox.west))
-	;
-};
-
-Mercator.prototype.toRadians = function(deg) {
+function toRadians(deg) {
 	return deg * Math.PI / 180;
-};
+}
 
-/* --------------------- */
+function mercator(λ, φ) {
+  return [λ, Math.log(Math.tan(Math.PI/4 + φ/2))];
+}
 
-var map = new Mercator({
-	mapSize: {
-		width: 1500,
-		height: 1000
-	},
-	bbox: {
-  		north: 48.296657,
-		south: 43.624366800000004,
-  		west: 20.255730500000002,
-  		east: 29.726612400000004 
-	}
-});
+function projection(lat, lon) {
+	return mercator(toRadians(lon), toRadians(lat));
+}
 
-var projection = function(lat, lon) {
-	return map.getPointString(lat,lon);
-};
+function percent(lonlat) {
+	return [
+		(lonlat[0] - west) / (east - west),
+		(lonlat[1] - south) / (north - south)
+	];
+}
 
-var i = 0;
 console.log('Mapping nodes using Mercador projection from file: ' + INPUT_FILE);
 fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
 		var coords = line.split(',');
 		var pts = [];
-		for (var j = 0; j < coords.length; j+=2) {
-			pts.push(projection(coords[j], coords[j+1]));
+		for (var i = 0; i < coords.length; i+=2) {
+			pts.push(
+				percent(
+					projection(coords[i], coords[i+1])
+				).join(',')
+			);
 		}
 		this.push(pts.join(';') + '\n');
 		next();

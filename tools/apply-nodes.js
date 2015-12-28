@@ -5,8 +5,8 @@ var levelup = require('level');
 var async = require('async');
 
 var DATABASE_NAME = 'everystreet';
-var INPUT_FILE = 'output/roads.txt';
-var OUTPUT_FILE = 'output/roads-with-coords.txt';
+var INPUT_FILE = 'output/streets.txt';
+var OUTPUT_FILE = 'output/streets-with-coordinates.txt';
 
 console.log('Applying node data from database ' + DATABASE_NAME + ' to street data from file: ' + INPUT_FILE);
 levelup(DATABASE_NAME, function(err, db) {

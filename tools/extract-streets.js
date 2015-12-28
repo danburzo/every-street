@@ -4,22 +4,22 @@ var osm_parser = require('osm-pbf-parser');
 var JSONStream = require('JSONStream');
 
 var INPUT_FILE = 'data/data.osm.pbf';
-var OUTPUT_FILE = 'output/roads.txt';
+var OUTPUT_FILE = 'output/streets.txt';
 
-function isRoad(item) {
+function isStreet(item) {
 	return item.type === 'way' && item.tags.highway;
 }
 
-console.log('Extracting roads from data file: ' + INPUT_FILE);
+console.log('Extracting streets from data file: ' + INPUT_FILE);
 fs.createReadStream(INPUT_FILE)
 	.pipe(new osm_parser())
 	.pipe(
 		through2.obj(function(items, enc, next) {
-			var roads = items.filter(isRoad).map(function(item) {
+			var streets = items.filter(isStreet).map(function(item) {
 				return item.refs;
 			});
-			if (roads.length) {
-				this.push(roads.map(function(road) {
+			if (streets.length) {
+				this.push(streets.map(function(road) {
 					return road.join(',');
 				}).join('\n'));
 			}
@@ -29,5 +29,5 @@ fs.createReadStream(INPUT_FILE)
 	.pipe(
 		fs.createWriteStream(OUTPUT_FILE)
 	).on('finish', function() {
-		console.log('Finished extracting roads onto file: ' + OUTPUT_FILE);
+		console.log('Finished extracting streets onto file: ' + OUTPUT_FILE);
 	});

@@ -3,31 +3,33 @@ var through2 = require('through2');
 var split2 = require('split2');
 var multiline = require('multiline');
 
-var INPUT_FILE = 'output/roads-with-coords-screen.txt';
-var OUTPUT_FILE = 'output/roads.svg';
+var DEFAULT_MAP_WIDTH = 1500; // px
+
+var INPUT_FILE = 'output/streets-with-coordinates-mapped.txt';
+var OUTPUT_FILE = 'output/streets.svg';
+var BBOX_FILE = 'output/bbox.json';
+
+var o = JSON.parse(fs.readFileSync(BBOX_FILE, 'utf8'));
+
+var map_width = DEFAULT_MAP_WIDTH;
+var map_height = map_width / o.ratio;
 
 var write_stream = fs.createWriteStream(OUTPUT_FILE);
 
-write_stream.write(multiline(function() {/*
-	<svg xmlns='http://www.w3.org/2000/svg' width='1500' height='1000' viewBox='0 0 1500 1000'>
-		<style>
-
-			svg {
-				background: black;
-			}
-			path {
-				stroke-width: 0.1;
-				fill: none;
-				stroke: white;
-			}
-		</style>
-*/}));
+write_stream.write(
+	"<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewbox='0 0 {w} {h}'>"
+		.replace(/\{w\}/g, map_width)
+		.replace(/\{h\}/g, map_height)
+);
 
 console.log('Generating SVG from file: ' + INPUT_FILE);
 fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
-		var path_data = 'M ' + line.replace(/\;/g, ' L ').replace(/\,/g, ' ');
+		var path_data = 'M ' + line.split(';').map(function(pt) {
+			var lonlat = pt.split(',');
+			return [lonlat[0] * map_width, (1 - lonlat[1]) * map_height].join(' ');
+		}).join(' L ');
 		this.push('<path d="' + path_data + '" stroke-width="0.1" stroke="black" fill="none"/>\n');
 		next();
 	}, function(flush) {
