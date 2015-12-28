@@ -1,3 +1,10 @@
+var fs = require('fs');
+var through2 = require('through2');
+var split2 = require('split2');
+
+var INPUT_FILE = 'output/roads-with-coords.txt';
+var OUTPUT_FILE = 'output/roads-with-coords-screen.txt';
+
 var Mercator = function(options) {
 	this.mapSize = options.mapSize;
 	this.bbox = options.bbox;
@@ -38,10 +45,6 @@ Mercator.prototype.toRadians = function(deg) {
 
 /* --------------------- */
 
-var fs = require('fs');
-var readline = require('readline');
-var stream = require('stream');
-
 var map = new Mercator({
 	mapSize: {
 		width: 1500,
@@ -59,12 +62,9 @@ var projection = function(lat, lon) {
 	return map.getPointString(lat,lon);
 };
 
-var fs = require('fs'),
-	through2 = require('through2'),
-	split2 = require('split2');
-
 var i = 0;
-fs.createReadStream('output/roads-with-coords.txt', { encoding: 'utf8' })
+console.log('Mapping nodes using Mercador projection from file: ' + INPUT_FILE);
+fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
 		var coords = line.split(',');
@@ -75,7 +75,7 @@ fs.createReadStream('output/roads-with-coords.txt', { encoding: 'utf8' })
 		this.push(pts.join(';') + '\n');
 		next();
 	}))
-	.pipe(fs.createWriteStream('output/roads-with-coords-screen.txt'))
+	.pipe(fs.createWriteStream(OUTPUT_FILE))
 	.on('finish', function() {
-		console.log('Finished mapping nodes using Mercator projection.');
+		console.log('Finished mapping nodes using Mercator projection onto file: ' + OUTPUT_FILE);
 	});
