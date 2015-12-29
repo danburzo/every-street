@@ -2,6 +2,7 @@ var fs = require('fs');
 var through2 = require('through2');
 var split2 = require('split2');
 var multiline = require('multiline');
+var simplify = require('simplify-js');
 
 var DEFAULT_MAP_WIDTH = 1500; // px
 
@@ -14,6 +15,11 @@ var o = JSON.parse(fs.readFileSync(BBOX_FILE, 'utf8'));
 var map_width = DEFAULT_MAP_WIDTH;
 var map_height = map_width / o.ratio;
 
+function process(points) {
+	// return points;
+	return simplify(points, 0.5);
+}
+
 var write_stream = fs.createWriteStream(OUTPUT_FILE);
 
 write_stream.write(
@@ -23,14 +29,34 @@ write_stream.write(
 );
 
 console.log('Generating SVG from file: ' + INPUT_FILE);
+
+var i = 0;
+var path_buffer = '';
+
 fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
-		var path_data = 'M ' + line.split(';').map(function(pt) {
+		var points = line.split(';').map(function(pt) {
 			var lonlat = pt.split(',');
-			return [lonlat[0] * map_width, (1 - lonlat[1]) * map_height].join(' ');
+			return {
+				x: lonlat[0] * map_width,
+				y: (1 - lonlat[1]) * map_height
+			};
+		});
+
+		var path_data = 'M ' + process(points).filter(function(pt) {
+			return pt;
+		}).map(function(pt) {
+			return pt.x + ' ' + pt.y;
 		}).join(' L ');
-		this.push('<path d="' + path_data + '" stroke-width="0.1" stroke="black" fill="none"/>\n');
+
+		path_buffer += path_data;
+		if (i++ > 999) {
+			this.push('<path d="' + path_buffer + '" stroke-width="0.2" stroke="black" fill="none"/>\n');
+			path_buffer = '';
+			i = 0;
+		}
+
 		next();
 	}, function(flush) {
 		this.push('</svg>');
