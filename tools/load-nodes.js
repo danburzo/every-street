@@ -2,6 +2,7 @@ var fs = require('fs');
 var through2 = require('through2');
 var split2 = require('split2');
 var levelup = require('level');
+var LevelWriteStream = require('level-writestream');
 
 var DATABASE_NAME = 'everystreet';
 var INPUT_FILE = 'output/nodes.txt';
@@ -10,7 +11,7 @@ var i = 0;
 
 console.log('creating levelDB database ' + DATABASE_NAME);
 levelup(DATABASE_NAME, function(err, db) {
-	// TODO why do we need a dummy write stream to pipe into?
+	LevelWriteStream(db);
 	var write_stream = db.createWriteStream();
 	fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 		.pipe(split2())
