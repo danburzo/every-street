@@ -20,6 +20,10 @@ function process(points) {
 	return simplify(points, 0.5);
 }
 
+function svgpath(path_data) {
+	return '<path d="' + path_data + '" stroke-width="0.2" stroke="black" fill="none"/>\n';
+};
+
 var write_stream = fs.createWriteStream(OUTPUT_FILE);
 
 write_stream.write(
@@ -36,7 +40,7 @@ var path_buffer = '';
 fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 	.pipe(split2())
 	.pipe(through2.obj(function(line, enc, next) {
-		var points = line.split(';').map(function(pt) {
+		var point_array = line.split(';').map(function(pt) {
 			var lonlat = pt.split(',');
 			return {
 				x: lonlat[0] * map_width,
@@ -44,21 +48,24 @@ fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 			};
 		});
 
-		var path_data = 'M ' + process(points).filter(function(pt) {
-			return pt;
+		var pts = process(point_array).filter(function(pt) {
+			return pt && !isNaN(pt.x) && !isNaN(pt.y);
 		}).map(function(pt) {
 			return pt.x + ' ' + pt.y;
-		}).join(' L ');
+		});
+
+		var path_data = pts.length ? (' M ' + pts.join(' L ')) : "";
 
 		path_buffer += path_data;
 		if (i++ > 999) {
-			this.push('<path d="' + path_buffer + '" stroke-width="0.2" stroke="black" fill="none"/>\n');
+			this.push(svgpath(path_buffer));
 			path_buffer = '';
 			i = 0;
 		}
 
 		next();
 	}, function(flush) {
+		this.push(svgpath(path_buffer));
 		this.push('</svg>');
 		flush();
 	}))

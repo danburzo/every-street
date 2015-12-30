@@ -4,6 +4,7 @@ data/*.osm.pbf
 # generated files
 output/*.txt
 output/*.svg
+output/*.json
 
 # leveldb
 db
