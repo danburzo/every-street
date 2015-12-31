@@ -10,7 +10,10 @@ var OUTPUT_FILE = 'output/streets-with-coordinates.txt';
 
 console.log('Applying node data from database ' + DATABASE_NAME + ' to street data from file: ' + INPUT_FILE);
 levelup(DATABASE_NAME, function(err, db) {
-
+	if (err) {
+		console.error(err);
+		return;
+	}
 	var write_stream = fs.createWriteStream(OUTPUT_FILE);
 
 	fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })

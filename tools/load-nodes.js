@@ -11,6 +11,10 @@ var i = 0;
 
 console.log('creating levelDB database ' + DATABASE_NAME);
 levelup(DATABASE_NAME, function(err, db) {
+	if (err) {
+		console.error(err);
+		return;
+	}
 	LevelWriteStream(db);
 	var write_stream = db.createWriteStream();
 	fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
