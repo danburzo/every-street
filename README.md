@@ -35,5 +35,5 @@ node tools/extract-data.js && node tools/load-nodes.js && node tools/apply-nodes
 ImageMagick has worked for me:
 
 ```bash
-convert -density 900 output/roads.svg output/roads.png
+convert -density 900 output/streets.svg output/streets.png
 ```
