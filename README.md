@@ -1,5 +1,7 @@
 # every-street
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/danburzo/every-street.svg)](https://greenkeeper.io/)
+
 Draw every street in Romania, based on OpenStreetMap data. 
 
 ![Sample](img/streets.jpg)
