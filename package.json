@@ -9,12 +9,11 @@
   "devDependencies": {
     "JSONStream": "^0.10.0",
     "async": "^0.9.0",
-    "level": "^1.4.0",
+    "level": "4.0.0",
     "level-writestream": "^0.1.3",
     "multiline": "^1.0.1",
     "osm-pbf-parser": "^2.1.2",
     "simplify-js": "^1.2.1",
-    "sphericalmercator": "^1.0.4",
     "split2": "^0.2.1",
     "through2": "^0.6.3"
   }

@@ -63,5 +63,5 @@ fs.createReadStream(INPUT_FILE, { encoding: 'utf8' })
 			ratio: (east - west) / (north - south)
 		};
 
-		fs.writeFile(OUTPUT_FILE, JSON.stringify(output, null, 2));
+		fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
 	});
